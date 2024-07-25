@@ -1,32 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html" class="has-background-dark">
 <head>
-    <meta charset:"UTF-8">
-    <title>Torre de Londres</title>
+    <title id="_tt_">Torre de Londres</title>
+    <!-- stylesheets -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <!-- fonts -->
+    <script type=" text/javascript " src=" https://cdn.jsdelivr.net/npm/brython@3.11/brython.min.js "></script>
+    <script type=" text/javascript " src=" https://cdn.jsdelivr.net/npm/brython@3.11/brython_stdlib.js "></script>
 </head>
-<body>
+<body onload="brython(
+    {debug: 1, pythonpath : ['./']})" class="has-background-grey-lighter">
+<script type="text/python">
+    """Página de entrada do aplicativo TorreLondres.
 
-<div style="position:absolute; left:80px; top:10px;">
-    <img src="https://i.imgur.com/JErcF8k.png">
-</div>
-<div style="position:absolute; left:180px; top:10px;">
+    .. codeauthor:: Carlo Oliveira <carlo@nce.ufrj.br>
 
-    <img src="https://i.imgur.com/JErcF8k.png"></div>
-<div style="position:absolute; left:280px; top:10px;">
+    Changelog
+    ---------
+    .. versionadded::    24.07
+            versão inicial (25).
 
-    <img src="https://i.imgur.com/JErcF8k.png"></div>
-<div style="position:absolute; left:50px; top:30px;">
-
-    <img src="https://i.imgur.com/hNCB7v3.png" width="100px"></div>
-<div style="position:absolute; left:50px; top:130px;">
-
-    <img src="https://i.imgur.com/goMGtsi.png" width="100px"></div>
-<div style="position:absolute; left:50px; top:230px;">
-
-    <img src="https://i.imgur.com/ERl5wQU.png" width="100px"></div>
-<div style="position:absolute; left:150px; top:230px;">
-
-    <img src="https://i.imgur.com/FwCTxwE.png" width="100px"></div>
+    |   **Open Source Notification:** This file is part of open source program **LABASE**
+    |   **Copyright © 2024  Carlo Oliveira** <carlo@nce.ufrj.br>,
+    |   **SPDX-License-Identifier:** `GNU General Public License v3.0 or later <http://is.gd/3Udt>`_.
+    |   `Labase <http://labase.selfip.org/>`_ - `NCE <https://portal.nce.ufrj.br>`_ - `UFRJ <https://ufrj.br/>`_.
+    """
+    from browser import document, alert, html
+    from main import torre
+    document["torre"] <= torre(html)
+    print("ok ag")
+</script>
+<div id="torre"></div>
 oi
 </body>
 </html>
