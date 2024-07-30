@@ -22,11 +22,8 @@ class Vaga:
 
     def entra(self, bola):
         self.bola = bola.entra(self.palito)
+        self.palito.lota()
         _ = self.vaga <= bola.vai()
-
-    def entra_(self, palito):
-        # self.bola = bola.entra(self.palito)
-        _ = self.vaga <= palito #.sai()
 
 
 class Bola:
@@ -44,10 +41,6 @@ class Bola:
         return self
 
     def vai(self):
-        return self.bola
-
-    def sai(self):
-        self.palito.sai()
         return self.bola
 
 
@@ -89,7 +82,7 @@ class Palito:
     def entra_(self, mao):
         print("self.palito.entra(mao)", self.loc, mao)
         self.vaga.entra(mao)
-        self.lota()
+        # self.lota()
 
     def vai(self):
         return self.palito
@@ -102,7 +95,6 @@ class Palito:
         _ = self
         pass
         print("self.palito.sai_()")
-        # return self.vaga.sai()
 
 
 class Torre:
@@ -112,7 +104,7 @@ class Torre:
         self.mao = Palito(h, 2, -200)
         [_palito.entra(Bola(h, _bola, self.move, self)) for _palito, _bola in zip(self.palito, bolas)]
 
-    def sai(self, bola=None):
+    def sai(self):
         return self
 
     def entra(self, bola):
@@ -130,9 +122,4 @@ class Torre:
 
 
 def main(h):
-    # palitos = [Palito(h, o, o) for o in range(3)]
-    # palitos[0].entra(Bola(h, amarelo))
-    # palitos[1].entra(Bola(h, vermelho))
-    # palitos[2].entra(Bola(h, azul))
-    # palitos = [_palito.vai() for _palito in palitos]
     return Torre(h).vai()
