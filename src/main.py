@@ -8,19 +8,19 @@ palita = 'https://i.imgur.com/JErcF8k.png'
 
 
 class Vaga:
-    def __init__(self, h=None, palito=None):
-        self.vaga = h.DIV(style={"position": "absolute", "bottom": "0px", "left": "-20px"})
+    def __init__(self, palito=None):
+        self.vaga = Torre.H.DIV(style={"position": "absolute", "bottom": "0px", "left": "-20px"})
         self.bola = None
         self.palito = palito
 
     def vai(self):
         return self.vaga
 
-    def sai(self):
-        bola, self.bola = self.bola.sai(), None
+    def tira(self):
+        bola, self.bola = self.bola.tira(), None
         return bola
 
-    def entra(self, bola):
+    def bota(self, bola):
         self.bola = bola.entra(self.palito)
         self.palito.lota()
         _ = self.vaga <= bola.vai()
@@ -36,7 +36,7 @@ class Bola:
         self.palito = palito
 
     def entra(self, palito=None):
-        self.palito.sai()
+        self.palito.tira()
         self.palito = palito
         return self
 
@@ -97,14 +97,15 @@ class Pilha:
 
 
 class Palito:
-    def __init__(self, h=None, ordem=0, top=300, move=None):
+    def __init__(self, ordem=0, top=300, move=None):
         def mover(ev):
             ev.stopPropagation()
             move(self)
+        h = Torre.H
         self.palito = h.DIV(h.IMG(src=palita, width="60px", height=f"{300-100*ordem}px"),
                             style={"position": "absolute", "top": f"{top+100*ordem}px",
                             "left": f"{30+ordem*150}px"})
-        self.vaga = Vaga(h, self)
+        self.vaga = Vaga(self)
         self.lotado = self
         self.loc = (ordem, top)
         _ = self.palito <= self.vaga.vai()
@@ -128,18 +129,18 @@ class Palito:
     def bola(self):
         return self.vaga.bola
 
-    def entra(self, mao):
+    def bota(self, mao):
         self.lotado.entra_(mao)
 
     def entra_(self, mao):
         print("self.palito.entra(mao)", self.loc, mao)
-        self.vaga.entra(mao)
+        self.vaga.bota(mao)
         # self.lota()
 
     def vai(self):
         return self.palito
 
-    def sai(self):
+    def tira(self):
         print(self.lotado is self)
         return self.lotado.sai_()
 
@@ -150,16 +151,18 @@ class Palito:
 
 
 class Torre:
-    def __init__(self, h=None, bolas=(amarelo, azul, vermelho)):
-        self.palito = [Palito(h, o, o, self.remove) for o in range(3)]
-        self.vaga = Vaga(h, self)
-        self.mao = Palito(h, 2, -200)
-        [_palito.entra(Bola(h, _bola, self.move, self)) for _palito, _bola in zip(self.palito, bolas)]
+    H = None
 
-    def sai(self):
+    def __init__(self, h=None, bolas=(amarelo, azul, vermelho)):
+        self.palito = [Palito(o, o, self.remove) for o in range(3)]
+        self.vaga = Vaga(self)
+        self.mao = Palito(2, -200)
+        [_palito.bota(Bola(h, _bola, self.move, self)) for _palito, _bola in zip(self.palito, bolas)]
+
+    def tira(self):
         return self
 
-    def entra(self, bola):
+    def bota(self, bola):
         pass
         # self.vaga.entra(bola)
 
@@ -167,11 +170,12 @@ class Torre:
         return [_palito.vai() for _palito in self.palito] + [self.mao.vai()]
 
     def move(self, palito):
-        self.mao.entra(palito)
+        self.mao.bota(palito)
 
     def remove(self, palito):
-        palito.entra(self.mao.bola())
+        palito.bota(self.mao.bola())
 
 
 def main(h):
+    Torre.H = h
     return Torre(h).vai()
