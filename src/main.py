@@ -44,6 +44,58 @@ class Bola:
         return self.bola
 
 
+class Pilha:
+    def __init__(self, maxsize=1):
+        self.pilha = []
+        self.pop_pilha = []
+        self.maxsize = maxsize
+        self.estado_pilha = self
+        self.bota = self.vai_e_bota
+        self.cria()
+
+    def cria(self):
+        class UmaVaga:
+            def __init__(self):
+                self.bola = None
+
+            def bota(self, bola):
+                self.bola = bola
+
+            def tira(self):
+                bola, self.bola = self.bola, None
+                return bola
+
+        class UltimaVaga(UmaVaga):
+            def bota(vaga, bola):
+                self.lotou()
+                super().bota(bola)
+
+            def tira(vaga):
+                self.vagou()
+                return super().tira()
+
+        self.pilha = [UltimaVaga()]+[UmaVaga() for _ in range(self.maxsize-1)]
+
+    def lotou(self):
+        self.bota = self.nao_bota
+
+    def vagou(self):
+        self.bota = self.vai_e_bota
+
+    def vai_e_bota(self, bola):
+        vaga = self.pilha.pop()
+        self.pop_pilha.append(vaga)
+        vaga.bota(bola)
+
+    def tira(self):
+        vaga = self.pop_pilha.pop()
+        self.pilha.append(vaga)
+        return vaga.tira()
+
+    def nao_bota(self, bola):
+        pass
+
+
 class Palito:
     def __init__(self, h=None, ordem=0, top=300, move=None):
         def mover(ev):
@@ -63,7 +115,7 @@ class Palito:
             def __init__(self, palito):
                 self.palito = palito
 
-            def entra_(self, mao):
+            def entra_(self, _):
                 print("self.palito.lotado.entra_()", self.palito.loc)
                 self.palito.lotado = self
 
