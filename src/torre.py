@@ -20,19 +20,33 @@ class Torre:
     def cria(self):
         h, altura, tor = Torre.H, 200, self
 
-        class Pino:
-            def __init__(self, p, top=altura, bola=None, tira=None):
-                # self.cheio = bola is not None
+        class Vaga:
+            def __init__(self, fundo, bola=None, maxsize=1):
                 self.bota, self.tira = self._bota, self._tira
-                tira = self.move_para_pino if tira else lambda *_: None
+                self.vaga_corrente = 0
                 self.bola = h.IMG(src=bola, width=100).bind("click", self.move_para_mao) if bola else None
-                self.vaga = h.DIV(style={"position": "absolute", "bottom": f"{0}px", "left": f"{-25}px"})
-                self.pino = h.DIV(
-                    [h.IMG(src=IMG.pa, width=50, height=300-100*p).bind("click", tira), self.vaga],
-                    style={"position": "absolute", "top": f"{top+100*p}px", "left": f"{p*100+50}px"}).bind(
-                    "click", tira)
-                _ = self.pino <= self.vaga
-                _ = self.vaga <= self.bola if bola else None
+                self._vaga = None
+                self.vaga = None
+
+            def cria_cheio(self):
+                _ = self
+                class_vaga = cv = Vaga(0)
+                class_vaga.vaga = None
+                cv.bota = lambda *_: None
+                return class_vaga
+
+            def cria_vaga(self, fundo, bola=None):
+                vaga = h.DIV(style={"position": "absolute", "bottom": f"{fundo}px", "left": f"{-25}px"})
+                _ = vaga <= self.bola if bola else None
+                class_vaga = Vaga(fundo, bola)
+                class_vaga.vaga = vaga
+                return class_vaga
+
+            def cria(self, fundo, bola=None, maxsize=1):
+                self._vaga = [self.cria_vaga(fundo+f*100, bola) for f in range(maxsize)]+[self.cria_cheio()]
+                self.vaga = self._vaga[self.vaga_corrente].vai()
+                return self
+                # _ = self.vaga <= self.bola if bola else None
 
             def _bota(self, pino=None):
                 pino(self.botando)
@@ -40,26 +54,44 @@ class Torre:
             def botando(self, bola=None):
                 self.bola = bola
                 _ = self.vaga <= bola
-                self.bota = lambda *_: None
+                # self.vaga_corrente += 1
+                _vaga = self._vaga[self.vaga_corrente]
+                self.bota = _vaga.bota
                 self.tira = self._tira
 
             def move_para_mao(self, ev):
                 ev.stopPropagation()
-                tor.mao.bota(self.tira)
-
-            def move_para_pino(self, ev):
-                ev.stopPropagation()
-                self.bota(tor.mao.tira)
+                tor.mao.vaga.bota(self.tira)
 
             def vai(self):
-                return self.pino
+                return self.vaga
 
             def _tira(self, pino):
                 print(pino, self.bola)
-                self.bota = self._bota
+                # self.vaga_corrente -= 1
+                # _vaga = self._vaga[self.vaga_corrente]
+                self.bota = self._bota  # _vaga.bota
+                # self.tira = _vaga.tira
                 self.tira = lambda *_: None
                 pino(self.bola)
 
+        class Pino:
+            def __init__(self, p, top=altura, bola=None, tira=None):
+                self.vaga = Vaga(p, bola).cria(p, bola)
+                # self.bota, self.tira = self.vaga.bota, self.vaga.tira
+                tira = self.move_para_pino if tira else lambda *_: None
+                self.pino = h.DIV(
+                    [h.IMG(src=IMG.pa, width=50, height=300-100*p).bind("click", tira)],
+                    style={"position": "absolute", "top": f"{top+100*p}px", "left": f"{p*100+50}px"}).bind(
+                    "click", tira)
+                _ = self.pino <= self.vaga.vai()
+
+            def move_para_pino(self, ev):
+                ev.stopPropagation()
+                self.vaga.bota(tor.mao.vaga.tira)
+
+            def vai(self):
+                return self.pino
         self.mao = Pino(2, -200)
         self.pinos = [Pino(p, bola=img, tira=True).vai() for p, img in enumerate(IMG[:-2])]+[self.mao.vai()]
 
