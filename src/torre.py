@@ -22,7 +22,8 @@ class Torre:
 
         class Pino:
             def __init__(self, p, top=altura, bola=None, tira=None):
-                self.cheio = bola is not None
+                # self.cheio = bola is not None
+                self.bota, self.tira = self._bota, self._tira
                 tira = self.move_para_pino if tira else lambda *_: None
                 self.bola = h.IMG(src=bola, width=100).bind("click", self.move_para_mao) if bola else None
                 self.vaga = h.DIV(style={"position": "absolute", "bottom": f"{0}px", "left": f"{-25}px"})
@@ -33,18 +34,14 @@ class Torre:
                 _ = self.pino <= self.vaga
                 _ = self.vaga <= self.bola if bola else None
 
-            def bota_(self, bola=None):
-                self.bola = bola = bola() if ((not self.cheio) and bola) else None
-                _ = self.vaga <= bola if bola else None
-                self.cheio = True
-
-            def bota(self, pino=None):
-                pino(self.botando) if not self.cheio else None
+            def _bota(self, pino=None):
+                pino(self.botando)
 
             def botando(self, bola=None):
                 self.bola = bola
-                _ = self.vaga <= bola if bola else None
-                self.cheio = True
+                _ = self.vaga <= bola
+                self.bota = lambda *_: None
+                self.tira = self._tira
 
             def move_para_mao(self, ev):
                 ev.stopPropagation()
@@ -57,28 +54,14 @@ class Torre:
             def vai(self):
                 return self.pino
 
-            def tira_(self, bola=None):
-                print(bola, self.cheio, self.bola)
-                if self.cheio:
-                    self.cheio = False
-                    bola = self.bola
-                return bola
-
-            def tira(self, pino):
-                print(pino, self.cheio, self.bola)
-                if self.cheio:
-                    self.cheio = False
-                    pino(self.bola)
-                # return bola
+            def _tira(self, pino):
+                print(pino, self.bola)
+                self.bota = self._bota
+                self.tira = lambda *_: None
+                pino(self.bola)
 
         self.mao = Pino(2, -200)
-        _ = [h.DIV(
-            [h.IMG(src=IMG.pa, width=50, height=300-100*p),
-             h.DIV(h.IMG(src=img, width=100), style={"position": "absolute", "bottom": f"{0}px", "left": f"{-25}px"})],
-            style={"position": "absolute", "top": f"{altura+100*p}px", "left": f"{p*100+50}px"})
-            for p, img in enumerate(IMG[:-2])]+[self.mao.vai()]
         self.pinos = [Pino(p, bola=img, tira=True).vai() for p, img in enumerate(IMG[:-2])]+[self.mao.vai()]
-        pass
 
 
 def torre(h):
