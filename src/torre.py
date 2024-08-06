@@ -38,13 +38,17 @@ class Torre:
             def cria_vaga(self, fundo, bola=None):
                 vaga = h.DIV(style={"position": "absolute", "bottom": f"{fundo}px", "left": f"{-25}px"})
                 _ = vaga <= self.bola if bola else None
+                print(bola)
+                self.bota = self._bota if not bola else lambda *_: None
                 class_vaga = Vaga(fundo, bola)
                 class_vaga.vaga = vaga
                 return class_vaga
 
             def cria(self, fundo, bola=None, maxsize=1):
-                self._vaga = [self.cria_vaga(fundo+f*100, bola) for f in range(maxsize)]+[self.cria_cheio()]
-                self.vaga = self._vaga[self.vaga_corrente].vai()
+                self._vaga = [self.cria_vaga(-fundo+f*100, bola) for f in range(maxsize)]  # +[self.cria_cheio()]
+                # self.vaga = self._vaga[self.vaga_corrente].vai()
+                self.vaga = [vg.vai() for vg in self._vaga]
+                print(fundo, maxsize)
                 return self
                 # _ = self.vaga <= self.bola if bola else None
 
@@ -53,10 +57,12 @@ class Torre:
 
             def botando(self, bola=None):
                 self.bola = bola
-                _ = self.vaga <= bola
-                # self.vaga_corrente += 1
+                # _ = self.vaga <= bola
+                self.vaga_corrente += 1 if self.vaga_corrente < len(self._vaga)-1 else 0
+                print(self.vaga_corrente, len(self._vaga))
                 _vaga = self._vaga[self.vaga_corrente]
-                self.bota = _vaga.bota
+                _ = _vaga.vaga <= bola
+                self.bota = lambda *_: None
                 self.tira = self._tira
 
             def move_para_mao(self, ev):
@@ -76,8 +82,8 @@ class Torre:
                 pino(self.bola)
 
         class Pino:
-            def __init__(self, p, top=altura, bola=None, tira=None):
-                self.vaga = Vaga(p, bola).cria(p, bola)
+            def __init__(self, p, top=altura, bola=None, tira=False):
+                self.vaga = Vaga(p, bola).cria(p, bola, 3-p)
                 # self.bota, self.tira = self.vaga.bota, self.vaga.tira
                 tira = self.move_para_pino if tira else lambda *_: None
                 self.pino = h.DIV(
